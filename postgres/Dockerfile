@@ -1,0 +1,3 @@
+FROM postgres
+ENV POSTGRES_PASSWORD="admin"
+ENV POSTGRES_USER="admin"

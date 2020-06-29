@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+  mosquitto:
+    build: ./mosquitto
+    networks:
+      network_1:
+        ipv4_address: 172.16.1.2
+    ports:
+      # The MQTT port
+      - "1883:1883"
+      # The port of the dashboard 
+      - "18083:18083"
+  
+  postgres:
+    build: ./postgres
+    networks:
+      network_1:
+        ipv4_address: 172.16.1.3
+
+  python-bridge:
+    build: ./python-bridge
+    command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; python dbwriter.py'
+    depends_on:
+     - postgres
+     - mosquitto
+    networks:
+      network_1:
+        ipv4_address: 172.16.1.4
+
+networks:
+  network_1:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.1.0/24"
